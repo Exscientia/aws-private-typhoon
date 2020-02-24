@@ -149,7 +149,7 @@ variable "enable_aggregation" {
 
 variable "worker_node_labels" {
   type        = list(string)
-  description = "List of initial worker node labels"
+  description = "A list of initial worker node labels"
   default     = []
 }
 
@@ -160,4 +160,3 @@ variable "cluster_domain_suffix" {
   description = "Queries for domains with the suffix will be answered by CoreDNS. Default is cluster.local (e.g. foo.default.svc.cluster.local)"
   default     = "cluster.local"
 }
-
