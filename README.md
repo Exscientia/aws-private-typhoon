@@ -2,55 +2,55 @@
 
 Typhoon is a minimal and free Kubernetes distribution.
 
-* Minimal, stable base Kubernetes distribution
-* Declarative infrastructure and configuration
-* [Free](#social-contract) (freedom and cost) and privacy-respecting
-* Practical for labs, datacenters, and clouds
+- Minimal, stable base Kubernetes distribution
+- Declarative infrastructure and configuration
+- [Free](#social-contract) (freedom and cost) and privacy-respecting
+- Practical for labs, datacenters, and clouds
 
 Typhoon distributes upstream Kubernetes, architectural conventions, and cluster addons, much like a GNU/Linux distribution provides the Linux kernel and userspace components.
 
 ## Features <a href="https://www.cncf.io/certification/software-conformance/"><img align="right" src="https://storage.googleapis.com/poseidon/certified-kubernetes.png"></a>
 
-* Kubernetes v1.17.3 (upstream)
-* Single or multi-master, [Calico](https://www.projectcalico.org/) or [flannel](https://github.com/coreos/flannel) networking
-* On-cluster etcd with TLS, [RBAC](https://kubernetes.io/docs/admin/authorization/rbac/)-enabled, [network policy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
-* Advanced features like [worker pools](https://typhoon.psdn.io/advanced/worker-pools/), [preemptible](https://typhoon.psdn.io/cl/google-cloud/#preemption) workers, and [snippets](https://typhoon.psdn.io/advanced/customization/#container-linux) customization
-* Ready for Ingress, Prometheus, Grafana, CSI, or other [addons](https://typhoon.psdn.io/addons/overview/)
+- Kubernetes v1.17.3 (upstream)
+- Single or multi-master, [Calico](https://www.projectcalico.org/) or [flannel](https://github.com/coreos/flannel) networking
+- On-cluster etcd with TLS, [RBAC](https://kubernetes.io/docs/admin/authorization/rbac/)-enabled, [network policy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+- Advanced features like [worker pools](https://typhoon.psdn.io/advanced/worker-pools/), [preemptible](https://typhoon.psdn.io/cl/google-cloud/#preemption) workers, and [snippets](https://typhoon.psdn.io/advanced/customization/#container-linux) customization
+- Ready for Ingress, Prometheus, Grafana, CSI, or other [addons](https://typhoon.psdn.io/addons/overview/)
 
 ## Modules
 
 Typhoon provides a Terraform Module for each supported operating system and platform.
 
-| Platform      | Operating System | Terraform Module | Status |
-|---------------|------------------|------------------|--------|
-| AWS           | Container Linux  | [aws/container-linux/kubernetes](aws/container-linux/kubernetes) | stable |
-| Azure         | Container Linux  | [azure/container-linux/kubernetes](azure/container-linux/kubernetes) | alpha |
-| Bare-Metal    | Container Linux  | [bare-metal/container-linux/kubernetes](bare-metal/container-linux/kubernetes) | stable |
-| Digital Ocean | Container Linux  | [digital-ocean/container-linux/kubernetes](digital-ocean/container-linux/kubernetes) | beta |
-| Google Cloud  | Container Linux  | [google-cloud/container-linux/kubernetes](google-cloud/container-linux/kubernetes) | stable |
+| Platform      | Operating System | Terraform Module                                                                     | Status |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------ | ------ |
+| AWS           | Container Linux  | [aws/container-linux/kubernetes](aws/container-linux/kubernetes)                     | stable |
+| Azure         | Container Linux  | [azure/container-linux/kubernetes](azure/container-linux/kubernetes)                 | alpha  |
+| Bare-Metal    | Container Linux  | [bare-metal/container-linux/kubernetes](bare-metal/container-linux/kubernetes)       | stable |
+| Digital Ocean | Container Linux  | [digital-ocean/container-linux/kubernetes](digital-ocean/container-linux/kubernetes) | beta   |
+| Google Cloud  | Container Linux  | [google-cloud/container-linux/kubernetes](google-cloud/container-linux/kubernetes)   | stable |
 
 Typhoon is available for [Fedora CoreOS](https://getfedora.org/coreos/).
 
-| Platform      | Operating System | Terraform Module | Status |
-|---------------|------------------|------------------|--------|
-| AWS           | Fedora CoreOS | [aws/fedora-coreos/kubernetes](aws/fedora-coreos/kubernetes) | beta |
-| Bare-Metal    | Fedora CoreOS | [bare-metal/fedora-coreos/kubernetes](bare-metal/fedora-coreos/kubernetes) | beta |
-| Google Cloud  | Fedora CoreOS | [google-cloud/fedora-coreos/kubernetes](google-cloud/fedora-coreos/kubernetes) | alpha |
+| Platform     | Operating System | Terraform Module                                                               | Status |
+| ------------ | ---------------- | ------------------------------------------------------------------------------ | ------ |
+| AWS          | Fedora CoreOS    | [aws/fedora-coreos/kubernetes](aws/fedora-coreos/kubernetes)                   | beta   |
+| Bare-Metal   | Fedora CoreOS    | [bare-metal/fedora-coreos/kubernetes](bare-metal/fedora-coreos/kubernetes)     | beta   |
+| Google Cloud | Fedora CoreOS    | [google-cloud/fedora-coreos/kubernetes](google-cloud/fedora-coreos/kubernetes) | alpha  |
 
 Typhoon is available for [Flatcar Container Linux](https://www.flatcar-linux.org/releases/).
 
-| Platform      | Operating System | Terraform Module | Status |
-|---------------|------------------|------------------|--------|
-| AWS           | Flatcar Linux    | [aws/container-linux/kubernetes](aws/container-linux/kubernetes) | stable |
-| Bare-Metal    | Flatcar Linux    | [bare-metal/container-linux/kubernetes](bare-metal/container-linux/kubernetes) | stable |
-| Google Cloud  | Flatcar Linux  | [google-cloud/container-linux/kubernetes](google-cloud/container-linux/kubernetes) | alpha |
-| Digital Ocean | Flatcar Linux  | [digital-ocean/container-linux/kubernetes](digital-ocean/container-linux/kubernetes) | alpha |
+| Platform      | Operating System | Terraform Module                                                                     | Status |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------ | ------ |
+| AWS           | Flatcar Linux    | [aws/container-linux/kubernetes](aws/container-linux/kubernetes)                     | stable |
+| Bare-Metal    | Flatcar Linux    | [bare-metal/container-linux/kubernetes](bare-metal/container-linux/kubernetes)       | stable |
+| Google Cloud  | Flatcar Linux    | [google-cloud/container-linux/kubernetes](google-cloud/container-linux/kubernetes)   | alpha  |
+| Digital Ocean | Flatcar Linux    | [digital-ocean/container-linux/kubernetes](digital-ocean/container-linux/kubernetes) | alpha  |
 
 ## Documentation
 
-* [Docs](https://typhoon.psdn.io)
-* Architecture [concepts](https://typhoon.psdn.io/architecture/concepts/) and [operating systems](https://typhoon.psdn.io/architecture/operating-systems/)
-* Tutorials for [AWS](docs/cl/aws.md), [Azure](docs/cl/azure.md), [Bare-Metal](docs/cl/bare-metal.md), [Digital Ocean](docs/cl/digital-ocean.md), and [Google-Cloud](docs/cl/google-cloud.md)
+- [Docs](https://typhoon.psdn.io)
+- Architecture [concepts](https://typhoon.psdn.io/architecture/concepts/) and [operating systems](https://typhoon.psdn.io/architecture/operating-systems/)
+- Tutorials for [AWS](docs/cl/aws.md), [Azure](docs/cl/azure.md), [Bare-Metal](docs/cl/bare-metal.md), [Digital Ocean](docs/cl/digital-ocean.md), and [Google-Cloud](docs/cl/google-cloud.md)
 
 ## Usage
 
@@ -102,7 +102,7 @@ yavin-worker-jrbf.c.example-com.internal   <none>   Ready   5m   v1.17.3
 yavin-worker-mzdm.c.example-com.internal   <none>   Ready   5m   v1.17.3
 ```
 
-List the pods.
+List pods.
 
 ```
 $ kubectl get pods --all-namespaces
@@ -124,9 +124,9 @@ kube-system   kube-scheduler-controller-0               1/1    Running   0      
 
 Typhoon is strict about minimalism, maturity, and scope. These are not in scope:
 
-* In-place Kubernetes Upgrades
-* Adding every possible option
-* Openstack or Mesos platforms
+- In-place Kubernetes Upgrades
+- Adding every possible option
+- Openstack or Mesos platforms
 
 ## Help
 
@@ -148,4 +148,4 @@ Typhoon clusters will contain only [free](https://www.debian.org/intro/free) com
 
 Typhoon does not accept money donations. Instead, we encourage you to donate to one of [these organizations](https://github.com/poseidon/typhoon/wiki/Donations) to show your appreciation.
 
-* [DigitalOcean](https://www.digitalocean.com/) kindly provides credits to support Typhoon test clusters.
+- [DigitalOcean](https://www.digitalocean.com/) kindly provides credits to support Typhoon test clusters.
