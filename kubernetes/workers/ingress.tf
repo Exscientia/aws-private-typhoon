@@ -21,6 +21,10 @@ resource "aws_lb_target_group" "workers-http" {
     # Interval between health checks required to be 10 or 30
     interval = 10
   }
+
+  tags = merge(var.tags, {
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
 }
 
 resource "aws_lb_target_group" "workers-https" {
@@ -44,5 +48,8 @@ resource "aws_lb_target_group" "workers-https" {
     # Interval between health checks required to be 10 or 30
     interval = 10
   }
-}
 
+  tags = merge(var.tags, {
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
+}
