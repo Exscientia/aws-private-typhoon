@@ -9,17 +9,17 @@ resource "aws_vpc" "network" {
   enable_dns_support               = true
   enable_dns_hostnames             = true
 
-  tags = {
-    "Name" = var.cluster_name
-  }
+  tags = merge(var.tags, {
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
 }
 
 resource "aws_internet_gateway" "gateway" {
   vpc_id = aws_vpc.network.id
 
-  tags = {
-    "Name" = var.cluster_name
-  }
+  tags = merge(var.tags, {
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
 }
 
 resource "aws_route_table" "default" {
@@ -35,9 +35,9 @@ resource "aws_route_table" "default" {
     gateway_id      = aws_internet_gateway.gateway.id
   }
 
-  tags = {
-    "Name" = var.cluster_name
-  }
+  tags = merge(var.tags, {
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
 }
 
 # Subnets (one per availability zone)
@@ -53,9 +53,11 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch         = true
   assign_ipv6_address_on_creation = true
 
-  tags = {
+  tags = merge(var.tags, {
     "Name" = "${var.cluster_name}-public-${count.index}"
-  }
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+    "kubernetes.io/role/elb" = "1"
+  })
 }
 
 resource "aws_route_table_association" "public" {
@@ -64,4 +66,3 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.default.id
   subnet_id      = aws_subnet.public.*.id[count.index]
 }
-
