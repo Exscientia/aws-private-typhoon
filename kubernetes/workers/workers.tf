@@ -1,19 +1,22 @@
 # Workers AutoScaling Group
 resource "aws_autoscaling_group" "workers" {
-  name = "${var.name}-worker ${aws_launch_configuration.worker.name}"
+  name = "${var.name}-worker ${aws_launch_template.worker.name}"
 
   # count
   desired_capacity          = var.worker_count
   min_size                  = var.worker_count
-  max_size                  = var.worker_count + 2
+  max_size                  = var.worker_count + 10
   default_cooldown          = 30
   health_check_grace_period = 30
 
   # network
-  vpc_zone_identifier = var.subnet_ids
+  vpc_zone_identifier = [var.subnet_ids[0]]
 
   # template
-  launch_configuration = aws_launch_configuration.worker.name
+  launch_template {
+    id      = aws_launch_template.worker.id
+    version = "$Latest"
+  }
 
   # target groups to which instances should be added
   target_group_arns = flatten([
@@ -38,35 +41,75 @@ resource "aws_autoscaling_group" "workers" {
       key                 = "Name"
       value               = "${var.name}-worker"
       propagate_at_launch = true
-    },
+      }, {
+      key                 = "k8s.io/cluster-autoscaler/enabled"
+      value               = "true"
+      propagate_at_launch = true
+      }, {
+      key                 = "k8s.io/cluster-autoscaler/${var.cluster_name}"
+      value               = "shared"
+      propagate_at_launch = true
+      }, {
+      key                 = "kubernetes.io/cluster/${var.cluster_name}"
+      value               = "shared"
+      propagate_at_launch = true
+    }
   ]
 }
 
 # Worker template
-resource "aws_launch_configuration" "worker" {
-  image_id          = local.ami_id
-  instance_type     = var.instance_type
-  spot_price        = var.spot_price > 0 ? var.spot_price : null
-  enable_monitoring = false
-
-  user_data = data.ct_config.worker-ignition.rendered
+resource "aws_launch_template" "worker" {
+  ebs_optimized = true
+  image_id      = local.ami_id
+  instance_type = var.instance_type
+  instance_market_options {
+    market_type = "spot"
+    spot_options {
+      max_price = var.spot_price
+    }
+  }
+  monitoring {
+    enabled = false
+  }
+  user_data = base64encode(data.ct_config.worker-ignition.rendered)
 
   # storage
-  root_block_device {
-    volume_type = var.disk_type
-    volume_size = var.disk_size
-    iops        = var.disk_iops
-    encrypted   = true
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_type = var.disk_type
+      volume_size = var.disk_size
+      iops        = var.disk_iops
+      encrypted   = true
+    }
   }
 
   # network
-  security_groups = var.security_groups
+  vpc_security_group_ids = var.security_groups
+
+  iam_instance_profile {
+    arn = var.worker_iam_instance_profile_arn
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = var.tags
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags          = var.tags
+  }
 
   lifecycle {
     // Override the default destroy and replace update behavior
     create_before_destroy = true
     ignore_changes        = [image_id]
   }
+
+  tags = merge(var.tags, {
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
 }
 
 # Worker Ignition config
@@ -74,6 +117,7 @@ data "ct_config" "worker-ignition" {
   content      = data.template_file.worker-config.rendered
   pretty_print = false
   snippets     = var.clc_snippets
+  platform     = "ec2"
 }
 
 # Worker Container Linux config
@@ -85,8 +129,7 @@ data "template_file" "worker-config" {
     ssh_authorized_key     = var.ssh_authorized_key
     cluster_dns_service_ip = cidrhost(var.service_cidr, 10)
     cluster_domain_suffix  = var.cluster_domain_suffix
-    cgroup_driver          = local.flavor == "flatcar" && local.channel == "edge" ? "systemd" : "cgroupfs"
+    cgroup_driver          = "cgroupfs"
     node_labels            = join(",", var.node_labels)
   }
 }
-
