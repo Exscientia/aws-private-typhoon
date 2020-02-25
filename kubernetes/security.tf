@@ -8,9 +8,10 @@ resource "aws_security_group" "controller" {
 
   vpc_id = aws_vpc.network.id
 
-  tags = {
-    "Name" = "${var.cluster_name}-controller"
-  }
+  tags = merge(var.tags, {
+    "Name" : "${var.cluster_name}-controller"
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
 }
 
 resource "aws_security_group_rule" "controller-ssh" {
@@ -222,9 +223,10 @@ resource "aws_security_group" "worker" {
 
   vpc_id = aws_vpc.network.id
 
-  tags = {
-    "Name" = "${var.cluster_name}-worker"
-  }
+  tags = merge(var.tags, {
+    "Name" : "${var.cluster_name}-worker"
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
 }
 
 resource "aws_security_group_rule" "worker-ssh" {
@@ -405,4 +407,3 @@ resource "aws_security_group_rule" "worker-egress" {
   cidr_blocks      = ["0.0.0.0/0"]
   ipv6_cidr_blocks = ["::/0"]
 }
-
