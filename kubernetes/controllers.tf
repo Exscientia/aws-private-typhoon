@@ -176,6 +176,7 @@ data "ct_config" "controller-ignitions" {
   content      = data.template_file.controller-configs.*.rendered[count.index]
   pretty_print = false
   snippets     = var.controller_clc_snippets
+  platform     = "ec2"
 }
 
 # Controller Container Linux configs
