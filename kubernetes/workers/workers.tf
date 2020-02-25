@@ -1,24 +1,19 @@
-# Workers AutoScaling Group
 resource "aws_autoscaling_group" "workers" {
   name = "${var.name}-worker ${aws_launch_template.worker.name}"
 
-  # count
   desired_capacity          = var.worker_count
   min_size                  = var.worker_count
   max_size                  = var.worker_count + 10
   default_cooldown          = 30
   health_check_grace_period = 30
 
-  # network
   vpc_zone_identifier = [var.subnet_ids[0]]
 
-  # template
   launch_template {
     id      = aws_launch_template.worker.id
     version = "$Latest"
   }
 
-  # target groups to which instances should be added
   target_group_arns = flatten([
     aws_lb_target_group.workers-http.id,
     aws_lb_target_group.workers-https.id,
@@ -57,7 +52,6 @@ resource "aws_autoscaling_group" "workers" {
   ]
 }
 
-# Worker template
 resource "aws_launch_template" "worker" {
   ebs_optimized = true
   image_id      = var.image_id
@@ -73,7 +67,6 @@ resource "aws_launch_template" "worker" {
   }
   user_data = base64encode(data.ct_config.worker-ignition.rendered)
 
-  # storage
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
@@ -84,7 +77,6 @@ resource "aws_launch_template" "worker" {
     }
   }
 
-  # network
   vpc_security_group_ids = var.security_groups
 
   iam_instance_profile {
@@ -112,7 +104,6 @@ resource "aws_launch_template" "worker" {
   })
 }
 
-# Worker Ignition config
 data "ct_config" "worker-ignition" {
   content      = data.template_file.worker-config.rendered
   pretty_print = false
@@ -120,7 +111,6 @@ data "ct_config" "worker-ignition" {
   platform     = "ec2"
 }
 
-# Worker Container Linux config
 data "template_file" "worker-config" {
   template = file("${path.module}/cl/worker.yaml")
 
