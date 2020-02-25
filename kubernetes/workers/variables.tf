@@ -3,6 +3,16 @@ variable "name" {
   description = "Unique name for the worker pool"
 }
 
+variable "cluster_name" {
+  type        = string
+  description = "Name of the host cluster"
+}
+
+variable "worker_iam_instance_profile_arn" {
+  type        = string
+  description = "ARN of the worker node iam instance profile"
+}
+
 # AWS
 
 variable "vpc_id" {
@@ -32,12 +42,6 @@ variable "instance_type" {
   type        = string
   description = "EC2 instance type"
   default     = "t3.small"
-}
-
-variable "os_image" {
-  type        = string
-  description = "AMI channel for a Container Linux derivative (coreos-stable, coreos-beta, coreos-alpha, flatcar-stable, flatcar-beta, flatcar-alpha, flatcar-edge)"
-  default     = "coreos-stable"
 }
 
 variable "disk_size" {
@@ -107,4 +111,9 @@ variable "node_labels" {
   type        = list(string)
   description = "List of initial node labels"
   default     = []
+}
+
+variable "tags" {
+  description = "Tags that will be applied to all (if possible) AWS resources that get created by this Terraform project"
+  type        = map
 }
