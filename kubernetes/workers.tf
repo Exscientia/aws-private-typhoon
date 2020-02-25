@@ -8,7 +8,8 @@ module "workers" {
   vpc_id                          = aws_vpc.network.id
   subnet_ids                      = aws_subnet.public.*.id
   security_groups                 = [aws_security_group.worker.id]
-  worker_count                    = var.worker_count
+  min_workers                     = var.min_workers
+  max_workers                     = var.max_workers
   instance_type                   = var.worker_type
   disk_size                       = var.disk_size
   spot_price                      = var.worker_price

@@ -1,9 +1,9 @@
 resource "aws_autoscaling_group" "workers" {
   name = "${var.name}-worker ${aws_launch_template.worker.name}"
 
-  desired_capacity          = var.worker_count
-  min_size                  = var.worker_count
-  max_size                  = var.worker_count + 10
+  desired_capacity          = var.min_workers
+  min_size                  = var.min_workers
+  max_size                  = var.max_workers
   default_cooldown          = 30
   health_check_grace_period = 30
 

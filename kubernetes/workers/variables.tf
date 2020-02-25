@@ -32,10 +32,16 @@ variable "security_groups" {
 
 # instances
 
-variable "worker_count" {
+variable "min_workers" {
   type        = number
-  description = "Number of instances"
+  description = "Minimum number of workers"
   default     = 1
+}
+
+variable "max_workers" {
+  type        = number
+  description = "Maximum number of workers"
+  default     = 10
 }
 
 variable "instance_type" {

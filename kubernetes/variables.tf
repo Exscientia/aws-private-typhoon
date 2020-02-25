@@ -23,10 +23,16 @@ variable "controller_count" {
   default     = 1
 }
 
-variable "worker_count" {
+variable "min_workers" {
   type        = number
-  description = "Number of workers"
+  description = "Minimum number of workers"
   default     = 1
+}
+
+variable "max_workers" {
+  type        = number
+  description = "Maximum number of workers"
+  default     = 10
 }
 
 variable "controller_type" {
