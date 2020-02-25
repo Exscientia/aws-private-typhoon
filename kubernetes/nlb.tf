@@ -22,6 +22,10 @@ resource "aws_lb" "nlb" {
   subnets = aws_subnet.public.*.id
 
   enable_cross_zone_load_balancing = true
+
+  tags = merge(var.tags, {
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
 }
 
 # Forward TCP apiserver traffic to controllers
@@ -81,6 +85,11 @@ resource "aws_lb_target_group" "controllers" {
     # Interval between health checks required to be 10 or 30
     interval = 10
   }
+
+
+  tags = merge(var.tags, {
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
 }
 
 # Attach controller instances to apiserver NLB
@@ -91,4 +100,3 @@ resource "aws_lb_target_group_attachment" "controllers" {
   target_id        = aws_instance.controllers.*.id[count.index]
   port             = 6443
 }
-
