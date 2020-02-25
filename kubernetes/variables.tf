@@ -41,12 +41,6 @@ variable "worker_type" {
   default     = "t3.small"
 }
 
-variable "os_image" {
-  type        = string
-  description = "AMI channel for a Container Linux derivative (coreos-stable, coreos-beta, coreos-alpha, flatcar-stable, flatcar-beta, flatcar-alpha, flatcar-edge)"
-  default     = "coreos-stable"
-}
-
 variable "disk_size" {
   type        = number
   description = "Size of the EBS volume in GB"
@@ -149,7 +143,7 @@ variable "enable_aggregation" {
 
 variable "worker_node_labels" {
   type        = list(string)
-  description = "A list of initial worker node labels"
+  description = "List of initial worker node labels"
   default     = []
 }
 
@@ -159,4 +153,9 @@ variable "cluster_domain_suffix" {
   type        = string
   description = "Queries for domains with the suffix will be answered by CoreDNS. Default is cluster.local (e.g. foo.default.svc.cluster.local)"
   default     = "cluster.local"
+}
+
+variable "tags" {
+  description = "Tags that will be applied to all (if possible) AWS resources that get created by this Terraform project"
+  type        = map
 }
