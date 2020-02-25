@@ -60,7 +60,7 @@ resource "aws_autoscaling_group" "workers" {
 # Worker template
 resource "aws_launch_template" "worker" {
   ebs_optimized = true
-  image_id      = local.ami_id
+  image_id      = var.image_id
   instance_type = var.instance_type
   instance_market_options {
     market_type = "spot"

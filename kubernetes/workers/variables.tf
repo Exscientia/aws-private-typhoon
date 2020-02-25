@@ -117,3 +117,8 @@ variable "tags" {
   description = "Tags that will be applied to all (if possible) AWS resources that get created by this Terraform project"
   type        = map
 }
+
+variable "image_id" {
+  type        = string
+  description = "AMI ID of the worker nodes"
+}
