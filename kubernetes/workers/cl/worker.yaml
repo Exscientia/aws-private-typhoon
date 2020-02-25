@@ -66,6 +66,7 @@ systemd:
           --mount volume=opt-cni-bin,target=/opt/cni/bin \
           docker://k8s.gcr.io/hyperkube:v1.17.3 \
           --exec=/usr/local/bin/kubelet -- \
+          --cloud-provider=aws \
           --anonymous-auth=false \
           --authentication-token-webhook \
           --authorization-mode=Webhook \
