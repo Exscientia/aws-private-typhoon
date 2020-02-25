@@ -2,6 +2,10 @@ output "kubeconfig-admin" {
   value = module.bootstrap.kubeconfig-admin
 }
 
+output "worker_iam_instance_profile_arn" {
+  value = aws_iam_instance_profile.worker_node.arn
+}
+
 # Outputs for Kubernetes Ingress
 
 output "ingress_dns_name" {
@@ -31,6 +35,11 @@ output "worker_security_groups" {
   description = "List of worker security group IDs"
 }
 
+output "controller_security_groups" {
+  value       = [aws_security_group.controller.id]
+  description = "List of controller security group IDs"
+}
+
 output "kubeconfig" {
   value = module.bootstrap.kubeconfig-kubelet
 }
@@ -51,4 +60,3 @@ output "worker_target_group_https" {
   description = "ARN of a target group of workers for HTTPS traffic"
   value       = module.workers.target_group_https
 }
-
