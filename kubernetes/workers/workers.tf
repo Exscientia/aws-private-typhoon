@@ -1,5 +1,6 @@
 resource "aws_autoscaling_group" "workers" {
-  name = "${var.name}-worker ${aws_launch_template.worker.name}"
+  count = length(var.subnet_ids)
+  name  = "${var.name}-${count.index}-worker ${aws_launch_template.worker.name}"
 
   desired_capacity          = var.min_workers
   min_size                  = var.min_workers
@@ -7,7 +8,7 @@ resource "aws_autoscaling_group" "workers" {
   default_cooldown          = 30
   health_check_grace_period = 30
 
-  vpc_zone_identifier = [var.subnet_ids[0]]
+  vpc_zone_identifier = [var.subnet_ids[count.index]]
 
   launch_template {
     id      = aws_launch_template.worker.id
@@ -34,7 +35,7 @@ resource "aws_autoscaling_group" "workers" {
   tags = [
     {
       key                 = "Name"
-      value               = "${var.name}-worker"
+      value               = "${var.name}-${count.index}-worker"
       propagate_at_launch = true
       }, {
       key                 = "k8s.io/cluster-autoscaler/enabled"
