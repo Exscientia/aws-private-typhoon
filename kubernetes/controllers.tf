@@ -17,14 +17,10 @@ resource "aws_route53_record" "etcds" {
 resource "aws_instance" "controllers" {
   count = var.controller_count
 
-  tags = {
-    Name = "${var.cluster_name}-controller-${count.index}"
-  }
-
+  ami           = local.ami_id
+  ebs_optimized = true
   instance_type = var.controller_type
-
-  ami       = local.ami_id
-  user_data = data.ct_config.controller-ignitions.*.rendered[count.index]
+  user_data     = data.ct_config.controller-ignitions.*.rendered[count.index]
 
   # storage
   root_block_device {
@@ -39,12 +35,139 @@ resource "aws_instance" "controllers" {
   subnet_id                   = aws_subnet.public.*.id[count.index]
   vpc_security_group_ids      = [aws_security_group.controller.id]
 
+  iam_instance_profile = aws_iam_instance_profile.controller_node.name
+
+  tags = merge(var.tags, {
+    Name : "${var.cluster_name}-controller-${count.index}"
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
+
+  volume_tags = merge(var.tags, {
+    Name = "${var.cluster_name}-controller-${count.index}"
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
+
   lifecycle {
     ignore_changes = [
       ami,
       user_data,
     ]
   }
+
+  depends_on = [
+    aws_lb.nlb
+  ]
+}
+
+resource "aws_iam_instance_profile" "controller_node" {
+  name = "${var.cluster_name}-controller-node"
+  role = aws_iam_role.controller_node.name
+}
+
+resource "aws_iam_role" "controller_node" {
+  name                  = "${var.cluster_name}-controller-node"
+  force_detach_policies = true
+  assume_role_policy    = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+  tags = merge(var.tags, {
+    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+  })
+}
+
+resource "aws_iam_policy" "controller_node" {
+  name = "${var.cluster_name}-controller-node"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": [
+      "autoscaling:DescribeAutoScalingGroups",
+      "autoscaling:DescribeAutoScalingInstances",
+      "autoscaling:DescribeLaunchConfigurations",
+      "autoscaling:SetDesiredCapacity",
+      "autoscaling:TerminateInstanceInAutoScalingGroup",
+      "autoscaling:DescribeTags",
+      "ec2:DescribeInstances",
+      "ec2:DescribeRegions",
+      "ec2:DescribeRouteTables",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeVolumes",
+      "ec2:CreateSecurityGroup",
+      "ec2:CreateTags",
+      "ec2:CreateVolume",
+      "ec2:ModifyInstanceAttribute",
+      "ec2:ModifyVolume",
+      "ec2:AttachVolume",
+      "ec2:AuthorizeSecurityGroupIngress",
+      "ec2:CreateRoute",
+      "ec2:DeleteRoute",
+      "ec2:DeleteSecurityGroup",
+      "ec2:DeleteVolume",
+      "ec2:DetachVolume",
+      "ec2:RevokeSecurityGroupIngress",
+      "ec2:DescribeVpcs",
+      "elasticloadbalancing:AddTags",
+      "elasticloadbalancing:AttachLoadBalancerToSubnets",
+      "elasticloadbalancing:ApplySecurityGroupsToLoadBalancer",
+      "elasticloadbalancing:CreateLoadBalancer",
+      "elasticloadbalancing:CreateLoadBalancerPolicy",
+      "elasticloadbalancing:CreateLoadBalancerListeners",
+      "elasticloadbalancing:ConfigureHealthCheck",
+      "elasticloadbalancing:DeleteLoadBalancer",
+      "elasticloadbalancing:DeleteLoadBalancerListeners",
+      "elasticloadbalancing:DescribeLoadBalancers",
+      "elasticloadbalancing:DescribeLoadBalancerAttributes",
+      "elasticloadbalancing:DetachLoadBalancerFromSubnets",
+      "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+      "elasticloadbalancing:ModifyLoadBalancerAttributes",
+      "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+      "elasticloadbalancing:SetLoadBalancerPoliciesForBackendServer",
+      "elasticloadbalancing:AddTags",
+      "elasticloadbalancing:CreateListener",
+      "elasticloadbalancing:CreateTargetGroup",
+      "elasticloadbalancing:DeleteListener",
+      "elasticloadbalancing:DeleteTargetGroup",
+      "elasticloadbalancing:DescribeListeners",
+      "elasticloadbalancing:DescribeLoadBalancerPolicies",
+      "elasticloadbalancing:DescribeTargetGroups",
+      "elasticloadbalancing:DescribeTargetHealth",
+      "elasticloadbalancing:ModifyListener",
+      "elasticloadbalancing:ModifyTargetGroup",
+      "elasticloadbalancing:RegisterTargets",
+      "elasticloadbalancing:DeregisterTargets",
+      "elasticloadbalancing:SetLoadBalancerPoliciesOfListener",
+      "iam:CreateServiceLinkedRole",
+      "kms:DescribeKey",
+      "elasticfilesystem:*"
+    ],
+    "Resource": [
+      "*"
+    ]
+  }]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "controller_node" {
+  role       = aws_iam_role.controller_node.name
+  policy_arn = aws_iam_policy.controller_node.arn
 }
 
 # Controller Ignition configs
@@ -64,10 +187,10 @@ data "template_file" "controller-configs" {
   vars = {
     # Cannot use cyclic dependencies on controllers or their DNS records
     etcd_name   = "etcd${count.index}"
-    etcd_domain = "${var.cluster_name}-etcd${count.index}.${var.dns_zone}"
+    etcd_domain = format("%s-etcd%d.%s", var.cluster_name, count.index, var.dns_zone)
     # etcd0=https://cluster-etcd0.example.com,etcd1=https://cluster-etcd1.example.com,...
     etcd_initial_cluster   = join(",", data.template_file.etcds.*.rendered)
-    cgroup_driver          = local.flavor == "flatcar" && local.channel == "edge" ? "systemd" : "cgroupfs"
+    cgroup_driver          = "cgroupfs"
     kubeconfig             = indent(10, module.bootstrap.kubeconfig-kubelet)
     ssh_authorized_key     = var.ssh_authorized_key
     cluster_dns_service_ip = cidrhost(var.service_cidr, 10)
@@ -85,4 +208,3 @@ data "template_file" "etcds" {
     dns_zone     = var.dns_zone
   }
 }
-
