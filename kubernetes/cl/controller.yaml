@@ -50,6 +50,8 @@ systemd:
         Description=Kubelet via Hyperkube
         Wants=rpc-statd.service
         [Service]
+        CPUAccounting=true
+        MemoryAccounting=true
         Environment=KUBELET_CGROUP_DRIVER=${cgroup_driver}
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/cni/net.d
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/manifests
