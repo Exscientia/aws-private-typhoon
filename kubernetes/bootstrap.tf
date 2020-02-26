@@ -13,5 +13,5 @@ module "bootstrap" {
   service_cidr          = var.service_cidr
   cluster_domain_suffix = var.cluster_domain_suffix
   enable_reporting      = false
-  enable_aggregation    = false
+  enable_aggregation    = var.enable_aggregation
 }
