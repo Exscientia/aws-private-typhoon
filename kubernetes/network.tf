@@ -7,11 +7,11 @@ data "aws_security_group" "default" {
 }
 
 locals {
-  vpc_cidr     = "${vpc_prefix}.0.0.0/16"
-  pod_cidr     = "${vpc_prefix}.2.0.0/16"
-  service_cidr = "${vpc_prefix}.3.0.0/16"
+  vpc_cidr     = "${var.vpc_prefix}.0.0.0/16"
+  pod_cidr     = "${var.vpc_prefix}.2.0.0/16"
+  service_cidr = "${var.vpc_prefix}.3.0.0/16"
   public_subnets = [
-    for i in range(data.aws_availability_zones.available.names) : "${vpc_prefix}.0.10${i}.0/24"
+    for i in range(data.aws_availability_zones.available.names) : "${var.vpc_prefix}.0.10${i}.0/24"
   ]
 }
 
