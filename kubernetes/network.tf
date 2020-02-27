@@ -10,9 +10,6 @@ locals {
   vpc_cidr     = "${var.cidr_prefix}.0.0.0/16"
   pod_cidr     = "${var.cidr_prefix}.2.0.0/16"
   service_cidr = "${var.cidr_prefix}.3.0.0/16"
-  public_subnets = [
-    for i, zone in data.aws_availability_zones.available.names : "${var.cidr_prefix}.0.10${i}.0/24"
-  ]
 }
 
 
@@ -20,11 +17,15 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.24.0"
 
-  name                           = "${var.cluster_name}-vpc"
-  cidr                           = local.vpc_cidr
-  azs                            = data.aws_availability_zones.available.names
-  private_subnets                = [local.pod_cidr, local.service_cidr]
-  public_subnets                 = local.public_subnets
+  name = "${var.cluster_name}-vpc"
+  cidr = local.vpc_cidr
+  azs  = data.aws_availability_zones.available.names
+  private_subnets = [
+    for i, zone in data.aws_availability_zones.available.names : cidrsubnet(local.vpc_cidr, 4, i)
+  ]
+  public_subnets = [
+    for i, zone in data.aws_availability_zones.available.names : cidrsubnet(local.vpc_cidr, 8, 100 + i)
+  ]
   enable_nat_gateway             = true
   single_nat_gateway             = true
   enable_dns_hostnames           = true
