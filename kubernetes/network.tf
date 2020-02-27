@@ -11,7 +11,7 @@ locals {
   pod_cidr     = "${var.cidr_prefix}.2.0.0/16"
   service_cidr = "${var.cidr_prefix}.3.0.0/16"
   public_subnets = [
-    for i in range(data.aws_availability_zones.available.names) : "${var.cidr_prefix}.0.10${i}.0/24"
+    for name, i in data.aws_availability_zones.available.names : "${var.cidr_prefix}.0.10${i}.0/24"
   ]
 }
 
