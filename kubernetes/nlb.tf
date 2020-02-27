@@ -19,7 +19,7 @@ resource "aws_lb" "nlb" {
   load_balancer_type = "network"
   internal           = false
 
-  subnets = aws_subnet.public.*.id
+  subnets = module.vpc.private_subnets
 
   enable_cross_zone_load_balancing = true
 
