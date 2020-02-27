@@ -31,8 +31,8 @@ resource "aws_instance" "controllers" {
   }
 
   # network
-  associate_public_ip_address = true
-  subnet_id                   = aws_subnet.public.*.id[count.index]
+  associate_public_ip_address = false
+  subnet_id                   = module.vpc.private_subnets[count.index]
   vpc_security_group_ids      = [aws_security_group.controller.id]
 
   iam_instance_profile = aws_iam_instance_profile.controller_node.name
@@ -194,7 +194,7 @@ data "template_file" "controller-configs" {
     cgroup_driver          = "cgroupfs"
     kubeconfig             = indent(10, module.bootstrap.kubeconfig-kubelet)
     ssh_authorized_key     = var.ssh_authorized_key
-    cluster_dns_service_ip = cidrhost(var.service_cidr, 10)
+    cluster_dns_service_ip = cidrhost(local.service_cidr, 10)
     cluster_domain_suffix  = var.cluster_domain_suffix
   }
 }

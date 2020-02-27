@@ -114,25 +114,10 @@ variable "network_mtu" {
   default     = 1480
 }
 
-variable "host_cidr" {
+variable "cidr_prefix" {
   type        = string
-  description = "CIDR IPv4 range to assign to EC2 nodes"
-  default     = "10.0.0.0/16"
-}
-
-variable "pod_cidr" {
-  type        = string
-  description = "CIDR IPv4 range to assign Kubernetes pods"
-  default     = "10.2.0.0/16"
-}
-
-variable "service_cidr" {
-  type        = string
-  description = <<EOD
-CIDR IPv4 range to assign Kubernetes services.
-The 1st IP will be reserved for kube_apiserver, the 10th IP will be reserved for coredns.
-EOD
-  default     = "10.3.0.0/16"
+  description = "CIDR IPv4 range prefix to assign to the VPC in which the cluster is deployed"
+  default     = "50"
 }
 
 variable "enable_reporting" {
@@ -143,8 +128,8 @@ variable "enable_reporting" {
 
 variable "enable_aggregation" {
   type        = bool
-  description = "Enable the Kubernetes Aggregation Layer (defaults to false)"
-  default     = false
+  description = "Enable the Kubernetes Aggregation Layer (defaults to true)"
+  default     = true
 }
 
 variable "worker_node_labels" {

@@ -1,68 +1,49 @@
-data "aws_availability_zones" "all" {
+data "aws_availability_zones" "available" {
 }
 
-# Network VPC, gateway, and routes
+data "aws_security_group" "default" {
+  name   = "default"
+  vpc_id = module.vpc.vpc_id
+}
 
-resource "aws_vpc" "network" {
-  cidr_block                       = var.host_cidr
-  assign_generated_ipv6_cidr_block = true
-  enable_dns_support               = true
-  enable_dns_hostnames             = true
+locals {
+  vpc_cidr     = "${vpc_prefix}.0.0.0/16"
+  pod_cidr     = "${vpc_prefix}.2.0.0/16"
+  service_cidr = "${vpc_prefix}.3.0.0/16"
+  public_subnets = [
+    for i in range(data.aws_availability_zones.available.names) : "${vpc_prefix}.0.10${i}.0/24"
+  ]
+}
+
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "2.24.0"
+
+  name                           = "${var.cluster_name}-vpc"
+  cidr                           = var.host_cidr
+  azs                            = data.aws_availability_zones.available.names
+  private_subnets                = [local.pod_cidr, local.service_cidr]
+  public_subnets                 = local.public_subnets
+  enable_nat_gateway             = true
+  single_nat_gateway             = true
+  enable_dns_hostnames           = true
+  enable_dns_support             = true
+  enable_classiclink             = true
+  enable_classiclink_dns_support = true
+  enable_vpn_gateway             = true
 
   tags = merge(var.tags, {
     "kubernetes.io/cluster/${var.cluster_name}" : "shared"
   })
-}
 
-resource "aws_internet_gateway" "gateway" {
-  vpc_id = aws_vpc.network.id
-
-  tags = merge(var.tags, {
+  public_subnet_tags = merge(var.tags, {
     "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+    "kubernetes.io/role/elb" : "1"
   })
-}
 
-resource "aws_route_table" "default" {
-  vpc_id = aws_vpc.network.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.gateway.id
-  }
-
-  route {
-    ipv6_cidr_block = "::/0"
-    gateway_id      = aws_internet_gateway.gateway.id
-  }
-
-  tags = merge(var.tags, {
+  private_subnet_tags = merge(var.tags, {
     "kubernetes.io/cluster/${var.cluster_name}" : "shared"
+    "kubernetes.io/role/internal-elb" : "1"
   })
-}
-
-# Subnets (one per availability zone)
-
-resource "aws_subnet" "public" {
-  count = length(data.aws_availability_zones.all.names)
-
-  vpc_id            = aws_vpc.network.id
-  availability_zone = data.aws_availability_zones.all.names[count.index]
-
-  cidr_block                      = cidrsubnet(var.host_cidr, 4, count.index)
-  ipv6_cidr_block                 = cidrsubnet(aws_vpc.network.ipv6_cidr_block, 8, count.index)
-  map_public_ip_on_launch         = true
-  assign_ipv6_address_on_creation = true
-
-  tags = merge(var.tags, {
-    "Name" = "${var.cluster_name}-public-${count.index}"
-    "kubernetes.io/cluster/${var.cluster_name}" : "shared"
-    "kubernetes.io/role/elb" = "1"
-  })
-}
-
-resource "aws_route_table_association" "public" {
-  count = length(data.aws_availability_zones.all.names)
-
-  route_table_id = aws_route_table.default.id
-  subnet_id      = aws_subnet.public.*.id[count.index]
 }

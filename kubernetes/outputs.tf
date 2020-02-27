@@ -21,12 +21,12 @@ output "ingress_zone_id" {
 # Outputs for worker pools
 
 output "vpc_id" {
-  value       = aws_vpc.network.id
+  value       = module.vpc.vpc_id
   description = "ID of the VPC for creating worker instances"
 }
 
 output "subnet_ids" {
-  value       = aws_subnet.public.*.id
+  value       = module.vpc.private_subnets
   description = "List of subnet IDs for creating worker instances"
 }
 
@@ -44,6 +44,10 @@ output "kubeconfig" {
   value = module.bootstrap.kubeconfig-kubelet
 }
 
+output "service_cidr" {
+  value = local.service_cidr
+}
+
 # Outputs for custom load balancing
 
 output "nlb_id" {
@@ -51,12 +55,12 @@ output "nlb_id" {
   value       = aws_lb.nlb.id
 }
 
-output "worker_target_group_http" {
-  description = "ARN of a target group of workers for HTTP traffic"
-  value       = module.workers.target_group_http
-}
+# output "worker_target_group_http" {
+#   description = "ARN of a target group of workers for HTTP traffic"
+#   value       = module.workers.target_group_http
+# }
 
-output "worker_target_group_https" {
-  description = "ARN of a target group of workers for HTTPS traffic"
-  value       = module.workers.target_group_https
-}
+# output "worker_target_group_https" {
+#   description = "ARN of a target group of workers for HTTPS traffic"
+#   value       = module.workers.target_group_https
+# }

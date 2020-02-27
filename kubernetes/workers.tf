@@ -5,7 +5,7 @@ module "workers" {
 
   # AWS
   image_id                        = local.ami_id
-  vpc_id                          = aws_vpc.network.id
+  vpc_id                          = module.vpc.vpc_id
   subnet_ids                      = aws_subnet.public.*.id
   security_groups                 = [aws_security_group.worker.id]
   min_workers                     = var.min_workers
@@ -19,7 +19,7 @@ module "workers" {
   # configuration
   kubeconfig            = module.bootstrap.kubeconfig-kubelet
   ssh_authorized_key    = var.ssh_authorized_key
-  service_cidr          = var.service_cidr
+  service_cidr          = local.service_cidr
   cluster_domain_suffix = var.cluster_domain_suffix
   clc_snippets          = var.worker_clc_snippets
   node_labels           = var.worker_node_labels

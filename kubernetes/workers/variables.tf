@@ -104,7 +104,6 @@ variable "service_cidr" {
 CIDR IPv4 range to assign Kubernetes services.
 The 1st IP will be reserved for kube_apiserver, the 10th IP will be reserved for coredns.
 EOD
-  default     = "10.3.0.0/16"
 }
 
 variable "cluster_domain_suffix" {

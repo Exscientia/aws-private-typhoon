@@ -9,8 +9,8 @@ module "bootstrap" {
   asset_dir             = var.asset_dir
   networking            = "calico"
   network_mtu           = var.network_mtu
-  pod_cidr              = var.pod_cidr
-  service_cidr          = var.service_cidr
+  pod_cidr              = local.pod_cidr
+  service_cidr          = local.service_cidr
   cluster_domain_suffix = var.cluster_domain_suffix
   enable_reporting      = false
   enable_aggregation    = var.enable_aggregation

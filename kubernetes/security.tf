@@ -6,7 +6,7 @@ resource "aws_security_group" "controller" {
   name        = "${var.cluster_name}-controller"
   description = "${var.cluster_name} controller security group"
 
-  vpc_id = aws_vpc.network.id
+  vpc_id = module.vpc.vpc_id
 
   tags = merge(var.tags, {
     "Name" : "${var.cluster_name}-controller"
@@ -221,7 +221,7 @@ resource "aws_security_group" "worker" {
   name        = "${var.cluster_name}-worker"
   description = "${var.cluster_name} worker security group"
 
-  vpc_id = aws_vpc.network.id
+  vpc_id = module.vpc.vpc_id
 
   tags = merge(var.tags, {
     "Name" : "${var.cluster_name}-worker"
