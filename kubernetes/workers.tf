@@ -6,7 +6,7 @@ module "workers" {
   # AWS
   image_id                        = local.ami_id
   vpc_id                          = module.vpc.vpc_id
-  subnet_ids                      = module.vpc.private_subnets
+  subnet_ids                      = module.vpc.public_subnets
   security_groups                 = [aws_security_group.worker.id]
   min_workers                     = var.min_workers
   max_workers                     = var.max_workers
