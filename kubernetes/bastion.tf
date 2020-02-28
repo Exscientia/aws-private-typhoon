@@ -11,7 +11,7 @@ resource "aws_instance" "bastion" {
     "${compact(concat(list(aws_security_group.bastion.id), [aws_security_group.controller.id]))}"
   ]
 
-  key_name                    = aws_key_pair.bastion.name
+  key_name                    = aws_key_pair.bastion.key_name
   associate_public_ip_address = true
   subnet_id                   = module.vpc.public_subnets[0]
 
