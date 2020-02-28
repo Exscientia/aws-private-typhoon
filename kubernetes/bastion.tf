@@ -6,7 +6,7 @@ resource "aws_key_pair" "bastion" {
 resource "aws_instance" "bastion" {
   ami           = local.bastion_ami_id
   instance_type = "t3.small"
-  user_data     = data.ct_config.controller-ignitions.*.rendered[count.index]
+  #   user_data     = data.ct_config.controller-ignitions.*.rendered[count.index]
   vpc_security_group_ids = [
     "${compact(concat(list(aws_security_group.bastion.id), [aws_security_group.controller.id]))}"
   ]
