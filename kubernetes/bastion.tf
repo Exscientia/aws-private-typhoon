@@ -8,7 +8,8 @@ resource "aws_instance" "bastion" {
   instance_type = "t3.small"
   #   user_data     = data.ct_config.controller-ignitions.*.rendered[count.index]
   vpc_security_group_ids = [
-    "${compact(concat(list(aws_security_group.bastion.id), [aws_security_group.controller.id]))}"
+    aws_security_group.bastion.id,
+    aws_security_group.controller.id
   ]
 
   key_name                    = aws_key_pair.bastion.key_name
