@@ -5,18 +5,14 @@ resource "tls_private_key" "bastion" {
 }
 
 resource "aws_key_pair" "bastion" {
-  key_name = "bastion"
-  # public_key = tls_private_key.bastion.public_key_openssh
-  public_key = var.ssh_authorized_key
+  key_name   = "bastion"
+  public_key = tls_private_key.bastion.public_key_openssh
+  # public_key = var.ssh_authorized_key
 }
 
 resource "aws_instance" "bastion" {
   ami           = local.bastion_ami_id
   instance_type = "t3.small"
-  user_data     = <<EOF
-#!/usr/bin/env bash
-echo '${join("\n", var.bastion_user_public_keys)}' > authorized_keys
-EOF
   key_name      = aws_key_pair.bastion.key_name
   vpc_security_group_ids = [
     aws_security_group.bastion.id,
@@ -46,28 +42,27 @@ EOF
   }
 }
 
-# resource "null_resource" "copy-bastion-secrets" {
-#   triggers = {
-#     public_ip = aws_instance.bastion.public_ip
-#   }
-#   depends_on = [
-#     aws_instance.bastion
-#   ]
+resource "null_resource" "copy-bastion-secrets" {
+  triggers = {
+    public_ip = aws_instance.bastion.public_ip
+  }
+  depends_on = [
+    aws_instance.bastion
+  ]
 
-#   connection {
-#     # private_key = tls_private_key.bastion.private_key_pem
-#     type = "ssh"
-#     host = aws_instance.bastion.public_ip
-#     user = "alpine"
-#   }
+  connection {
+    private_key = tls_private_key.bastion.private_key_pem
+    type        = "ssh"
+    host        = aws_instance.bastion.public_ip
+    user        = "alpine"
+  }
 
-#   provisioner "remote-exec" {
-#     inline = [
-#       "echo '${join("\n", var.bastion_user_public_keys)}' > authorized_keys",
-#       "sudo mv authorized_keys /root/.ssh/authorized_keys",
-#     ]
-#   }
-# }
+  provisioner "remote-exec" {
+    inline = [
+      "echo -e '${tls_private_key.bastion.public_key_openssh}\n${join("\n", var.bastion_user_public_keys)}' > /home/alpine/.ssh/authorized_keys"
+    ]
+  }
+}
 
 resource "aws_security_group" "bastion" {
   name        = "${var.cluster_name}-bastion"
