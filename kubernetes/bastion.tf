@@ -1,7 +1,19 @@
+
+resource "tls_private_key" "bastion" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "bastion" {
+  key_name   = "bastion"
+  public_key = tls_private_key.bastion.public_key_openssh
+}
+
 resource "aws_instance" "bastion" {
   ami           = local.bastion_ami_id
   instance_type = "t3.small"
   #   user_data     = data.ct_config.controller-ignitions.*.rendered[count.index]
+  key_name = aws_key_pair.bastion.key_name
   vpc_security_group_ids = [
     aws_security_group.bastion.id,
     aws_security_group.controller.id
@@ -21,6 +33,14 @@ resource "aws_instance" "bastion" {
     Name = "${var.cluster_name}-bastion"
     "kubernetes.io/cluster/${var.cluster_name}" : "shared"
   })
+
+  connection {
+    type        = "ssh"
+    host        = self.public_ip
+    user        = "alpine"
+    private_key = tls_private_key.bastion.private_key_pem
+    timeout     = "15m"
+  }
 
   provisioner "file" {
     content     = join("\n", var.bastion_user_public_keys)
