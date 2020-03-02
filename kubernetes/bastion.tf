@@ -57,12 +57,12 @@ resource "null_resource" "copy-bastion-secrets" {
 
   provisioner "file" {
     content     = join("\n", var.bastion_user_public_keys)
-    destination = "/tmp/authorized_keys"
+    destination = "/authorized_keys"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "sudo mv /tmp/authorized_keys /root/.ssh/authorized_keys",
+      "sudo mv /authorized_keys /root/.ssh/authorized_keys",
       "sudo chmod 644 /root/.ssh/authorized_keys",
     ]
   }
