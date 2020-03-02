@@ -16,10 +16,11 @@ resource "null_resource" "copy-controller-secrets" {
   ]
 
   connection {
-    type    = "ssh"
-    host    = aws_instance.controllers.*.public_ip[count.index]
-    user    = "core"
-    timeout = "15m"
+    type        = "ssh"
+    host        = aws_instance.controllers.*.public_ip[count.index]
+    user        = "core"
+    timeout     = "15m"
+    private_key = tls_private_key.bastion.private_key_pem
 
     bastion_host        = aws_instance.bastion.public_ip
     bastion_user        = "alpine"
