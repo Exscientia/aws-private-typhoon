@@ -43,8 +43,11 @@ resource "aws_instance" "bastion" {
 }
 
 resource "null_resource" "copy-bastion-secrets" {
+  triggers = {
+    public_ip = aws_instance.bastion.public_ip
+  }
   depends_on = [
-    aws_instance.bastion,
+    aws_instance.bastion
   ]
 
   connection {
@@ -53,17 +56,12 @@ resource "null_resource" "copy-bastion-secrets" {
     user        = "alpine"
     private_key = tls_private_key.bastion.private_key_pem
     timeout     = "15m"
-  }
-
-  provisioner "file" {
-    content     = join("\n", var.bastion_user_public_keys)
-    destination = "/authorized_keys"
+    agent       = true
   }
 
   provisioner "remote-exec" {
     inline = [
-      "sudo mv /authorized_keys /root/.ssh/authorized_keys",
-      "sudo chmod 644 /root/.ssh/authorized_keys",
+      "sudo echo '${join("\n", var.bastion_user_public_keys)}' >> /root/.ssh/authorized_keys",
     ]
   }
 }
