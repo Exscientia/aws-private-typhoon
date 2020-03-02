@@ -34,9 +34,22 @@ resource "aws_instance" "bastion" {
     "kubernetes.io/cluster/${var.cluster_name}" : "shared"
   })
 
+  lifecycle {
+    ignore_changes = [
+      ami,
+      user_data,
+    ]
+  }
+}
+
+resource "null_resource" "copy-bastion-secrets" {
+  depends_on = [
+    aws_instance.bastion,
+  ]
+
   connection {
     type        = "ssh"
-    host        = self.public_ip
+    host        = aws_instance.bastion.public_ip
     user        = "alpine"
     private_key = tls_private_key.bastion.private_key_pem
     timeout     = "15m"
@@ -51,13 +64,6 @@ resource "aws_instance" "bastion" {
     inline = [
       "sudo mv /tmp/authorized_keys /root/.ssh/authorized_keys",
       "sudo chmod 644 /root/.ssh/authorized_keys",
-    ]
-  }
-
-  lifecycle {
-    ignore_changes = [
-      ami,
-      user_data,
     ]
   }
 }
