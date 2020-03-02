@@ -44,7 +44,7 @@ resource "aws_instance" "bastion" {
 
   provisioner "file" {
     content     = join("\n", var.bastion_user_public_keys)
-    destination = "/root/.ssh/authorized_keys"
+    destination = "/tmp/authorized_keys"
   }
 
   lifecycle {
