@@ -5,8 +5,9 @@ resource "tls_private_key" "bastion" {
 }
 
 resource "aws_key_pair" "bastion" {
-  key_name   = "bastion"
-  public_key = tls_private_key.bastion.public_key_openssh
+  key_name = "bastion"
+  # public_key = tls_private_key.bastion.public_key_openssh
+  public_key = var.ssh_authorized_key
 }
 
 resource "aws_instance" "bastion" {
@@ -51,12 +52,10 @@ resource "null_resource" "copy-bastion-secrets" {
   ]
 
   connection {
-    type        = "ssh"
-    host        = aws_instance.bastion.public_ip
-    user        = "alpine"
-    private_key = tls_private_key.bastion.private_key_pem
-    timeout     = "15m"
-    agent       = true
+    # private_key = tls_private_key.bastion.private_key_pem
+    type = "ssh"
+    host = aws_instance.bastion.public_ip
+    user = "alpine"
   }
 
   provisioner "remote-exec" {
