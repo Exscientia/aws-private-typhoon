@@ -89,6 +89,12 @@ variable "worker_clc_snippets" {
   default     = []
 }
 
+variable "bastion_user_public_keys" {
+  type        = list(string)
+  description = "List of public keys to install onto the Bastion instance"
+  default     = []
+}
+
 # configuration
 
 variable "ssh_authorized_key" {

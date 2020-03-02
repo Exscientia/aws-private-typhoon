@@ -1,8 +1,3 @@
-resource "aws_key_pair" "bastion" {
-  key_name   = "bastion"
-  public_key = var.ssh_authorized_key
-}
-
 resource "aws_instance" "bastion" {
   ami           = local.bastion_ami_id
   instance_type = "t3.small"
@@ -12,7 +7,6 @@ resource "aws_instance" "bastion" {
     aws_security_group.controller.id
   ]
 
-  key_name                    = aws_key_pair.bastion.key_name
   associate_public_ip_address = true
   subnet_id                   = module.vpc.public_subnets[0]
 
@@ -27,6 +21,11 @@ resource "aws_instance" "bastion" {
     Name = "${var.cluster_name}-bastion"
     "kubernetes.io/cluster/${var.cluster_name}" : "shared"
   })
+
+  provisioner "file" {
+    content     = join("\n", var.bastion_user_public_keys)
+    destination = "/root/.ssh/authorized_keys"
+  }
 
   lifecycle {
     ignore_changes = [
