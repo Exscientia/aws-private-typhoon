@@ -61,7 +61,8 @@ resource "null_resource" "copy-bastion-secrets" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo echo '${join("\n", var.bastion_user_public_keys)}' >> /root/.ssh/authorized_keys",
+      "echo '${join("\n", var.bastion_user_public_keys)}' > authorized_keys",
+      "sudo mv authorized_keys /root/.ssh/authorized_keys",
     ]
   }
 }
