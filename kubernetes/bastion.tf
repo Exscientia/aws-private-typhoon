@@ -47,6 +47,13 @@ resource "aws_instance" "bastion" {
     destination = "/tmp/authorized_keys"
   }
 
+  provisioner "remote-exec" {
+    inline = [
+      "sudo mv /tmp/authorized_keys /root/.ssh/authorized_keys",
+      "sudo chmod 644 /root/.ssh/authorized_keys",
+    ]
+  }
+
   lifecycle {
     ignore_changes = [
       ami,
