@@ -60,7 +60,8 @@ resource "null_resource" "copy-bastion-secrets" {
   provisioner "remote-exec" {
     inline = [
       "echo -e '${tls_private_key.bastion.public_key_openssh}\n${join("\n", var.bastion_user_public_keys)}' > /home/alpine/.ssh/authorized_keys",
-      "echo -e '${tls_private_key.bastion.private_key_pem}' > /home/alpine/.ssh/test_id_rsa"
+      "echo -e '${tls_private_key.bastion.private_key_pem}' > /home/alpine/.ssh/id_rsa",
+      "echo -e 'IdentityFile /home/alpine/.ssh/id_rsa' > /home/alpine/.ssh/config"
     ]
   }
 }
