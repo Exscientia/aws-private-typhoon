@@ -22,11 +22,8 @@ resource "null_resource" "copy-controller-secrets" {
     timeout     = "15m"
     private_key = tls_private_key.bastion.private_key_pem
 
-    bastion_host        = aws_instance.bastion.public_ip
-    bastion_user        = "alpine"
-    bastion_private_key = tls_private_key.bastion.private_key_pem
-    # bastion_host_key    = tls_private_key.bastion.public_key_openssh
-    # bastion_certificate - The contents of a signed CA Certificate. The certificate argument must be used in conjunction with a bastion_private_key. These can be loaded from a file on disk using the the file function.
+    bastion_host = aws_instance.bastion.public_ip
+    bastion_user = "alpine"
   }
 
   provisioner "file" {
