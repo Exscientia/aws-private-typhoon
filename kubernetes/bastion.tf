@@ -80,6 +80,13 @@ resource "aws_security_group" "bastion" {
     cidr_blocks = var.bastion_whitelist
   }
 
+  egress {
+    protocol        = "tcp"
+    from_port       = 22
+    to_port         = 22
+    security_groups = [aws_security_group.controller.id]
+  }
+
   ingress {
     from_port       = 0
     to_port         = 0
