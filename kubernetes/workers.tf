@@ -17,8 +17,7 @@ module "workers" {
   worker_iam_instance_profile_arn = aws_iam_instance_profile.worker_node.arn
 
   # configuration
-  kubeconfig = module.bootstrap.kubeconfig-kubelet
-  # ssh_authorized_key    = var.ssh_authorized_key
+  kubeconfig            = module.bootstrap.kubeconfig-kubelet
   ssh_authorized_key    = tls_private_key.bastion.public_key_openssh
   service_cidr          = local.service_cidr
   cluster_domain_suffix = var.cluster_domain_suffix

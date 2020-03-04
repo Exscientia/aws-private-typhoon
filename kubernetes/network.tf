@@ -39,11 +39,13 @@ module "vpc" {
   })
 
   public_subnet_tags = merge(var.tags, {
+    "Name" : "${var.cluster_name} public"
     "kubernetes.io/cluster/${var.cluster_name}" : "shared"
     "kubernetes.io/role/elb" : "1"
   })
 
   private_subnet_tags = merge(var.tags, {
+    "Name" : "${var.cluster_name} private"
     "kubernetes.io/cluster/${var.cluster_name}" : "shared"
     "kubernetes.io/role/internal-elb" : "1"
   })

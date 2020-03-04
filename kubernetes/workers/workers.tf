@@ -16,8 +16,6 @@ resource "aws_autoscaling_group" "workers" {
   }
 
   target_group_arns = flatten([
-    # aws_lb_target_group.workers-http.id,
-    # aws_lb_target_group.workers-https.id,
     var.target_groups,
   ])
 
