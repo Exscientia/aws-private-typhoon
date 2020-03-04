@@ -47,10 +47,14 @@ resource "null_resource" "bootstrap" {
   ]
 
   connection {
-    type    = "ssh"
-    host    = aws_instance.controllers[0].public_ip
-    user    = "core"
-    timeout = "15m"
+    type        = "ssh"
+    host        = aws_instance.controllers.*.private_ip[count.index]
+    user        = "core"
+    timeout     = "15m"
+    private_key = tls_private_key.bastion.private_key_pem
+
+    bastion_host = aws_instance.bastion.public_ip
+    bastion_user = "alpine"
   }
 
   provisioner "remote-exec" {

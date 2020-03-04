@@ -63,7 +63,8 @@ resource "null_resource" "copy-bastion-secrets" {
       "echo -e '${tls_private_key.bastion.private_key_pem}' > /home/alpine/.ssh/id_rsa",
       "chmod 600 /home/alpine/.ssh/id_rsa",
       "echo -e 'IdentityFile /home/alpine/.ssh/id_rsa' > /home/alpine/.ssh/config",
-      "echo 'AllowTCPForwarding yes' | sudo tee -a /etc/ssh/sshd_config"
+      "sudo sed -i 's/AllowTcpForwarding.*/AllowTcpForwarding yes/' /etc/ssh/sshd_config",
+      "sudo /etc/init.d/sshd restart"
     ]
   }
 }
