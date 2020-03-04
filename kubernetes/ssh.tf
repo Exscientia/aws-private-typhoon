@@ -48,7 +48,7 @@ resource "null_resource" "bootstrap" {
 
   connection {
     type        = "ssh"
-    host        = aws_instance.controllers.*.private_ip[count.index]
+    host        = aws_instance.controllers[0].private_ip
     user        = "core"
     timeout     = "15m"
     private_key = tls_private_key.bastion.private_key_pem

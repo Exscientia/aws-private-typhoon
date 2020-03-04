@@ -31,7 +31,7 @@ resource "aws_instance" "controllers" {
   }
 
   # network
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   subnet_id                   = element(module.vpc.public_subnets, count.index)
   vpc_security_group_ids      = [aws_security_group.controller.id]
 
