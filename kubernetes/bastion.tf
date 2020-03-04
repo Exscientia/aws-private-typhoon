@@ -7,7 +7,6 @@ resource "tls_private_key" "bastion" {
 resource "aws_key_pair" "bastion" {
   key_name   = "bastion"
   public_key = tls_private_key.bastion.public_key_openssh
-  # public_key = var.ssh_authorized_key
 }
 
 resource "aws_instance" "bastion" {
@@ -15,8 +14,7 @@ resource "aws_instance" "bastion" {
   instance_type = "t3.small"
   key_name      = aws_key_pair.bastion.key_name
   vpc_security_group_ids = [
-    aws_security_group.bastion.id,
-    aws_security_group.controller.id
+    aws_security_group.bastion.id
   ]
 
   associate_public_ip_address = true
@@ -79,7 +77,7 @@ resource "aws_security_group" "bastion" {
     from_port = 22
     to_port   = 22
 
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.bastion_whitelist
   }
 
   ingress {

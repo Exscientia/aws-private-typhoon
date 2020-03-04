@@ -97,9 +97,10 @@ variable "bastion_user_public_keys" {
 
 # configuration
 
-variable "ssh_authorized_key" {
-  type        = string
-  description = "SSH public key for user 'core'"
+variable "bastion_whitelist" {
+  type        = list(string)
+  description = "A list of network CIDRs that will be whitelisted for SSH access to the bastion"
+  default     = ["0.0.0.0/0"]
 }
 
 variable "asset_dir" {
