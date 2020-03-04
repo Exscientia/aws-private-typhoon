@@ -32,7 +32,7 @@ resource "aws_instance" "controllers" {
 
   # network
   associate_public_ip_address = false
-  subnet_id                   = element(module.vpc.public_subnets, count.index)
+  subnet_id                   = element(module.vpc.private_subnets, count.index)
   vpc_security_group_ids      = [aws_security_group.controller.id]
 
   iam_instance_profile = aws_iam_instance_profile.controller_node.name
