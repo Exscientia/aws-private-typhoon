@@ -35,6 +35,11 @@ output "public_subnet_ids" {
   description = "List of subnet IDs for services / LBs"
 }
 
+output "internet_gateway_id" {
+  value       = module.vpc.igw_id
+  description = "Internet Gateway serving the public parts of the cluster"
+}
+
 output "worker_security_groups" {
   value       = [aws_security_group.worker.id]
   description = "List of worker security group IDs"
