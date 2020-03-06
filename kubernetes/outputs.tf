@@ -25,9 +25,14 @@ output "vpc_id" {
   description = "ID of the VPC for creating worker instances"
 }
 
-output "subnet_ids" {
+output "private_subnet_ids" {
   value       = module.vpc.private_subnets
   description = "List of subnet IDs for creating worker instances"
+}
+
+output "public_subnet_ids" {
+  value       = module.vpc.public_subnets
+  description = "List of subnet IDs for services / LBs"
 }
 
 output "worker_security_groups" {
