@@ -14,9 +14,9 @@ resource "aws_route53_record" "apiserver" {
 resource "aws_lb" "nlb" {
   name               = "${var.cluster_name}-nlb"
   load_balancer_type = "network"
-  internal           = false
+  internal           = true
 
-  subnets = module.vpc.public_subnets
+  subnets = module.vpc.private_subnets
 
   enable_cross_zone_load_balancing = true
 
