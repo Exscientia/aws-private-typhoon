@@ -22,8 +22,11 @@ resource "aws_autoscaling_group" "workers" {
   lifecycle {
     # override the default destroy and replace update behavior
     create_before_destroy = true
+    ignore_changes = [
+      # Ignore changes to desired_capacity to avoid hectic scale down on update
+      desired_capacity
+    ]
   }
-
   # Waiting for instance creation delays adding the ASG to state. If instances
   # can't be created (e.g. spot price too low), the ASG will be orphaned.
   # Orphaned ASGs escape cleanup, can't be updated, and keep bidding if spot is
